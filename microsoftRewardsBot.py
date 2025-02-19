@@ -3,9 +3,9 @@ import random
 from selenium import webdriver
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
-from selenium.webdriver.edge.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
+from selenium.webdriver.edge.service import Service
 from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 # Sample question templates
@@ -29,9 +29,14 @@ topics = [
     "psychology", "deep sea creatures", "neural networks", "medieval castles"
 ]
 
-# Initialize Edge WebDriver properly
+# Attach to an existing Edge window
+options = webdriver.EdgeOptions()
+options.add_experimental_option("debuggerAddress", "localhost:9222")  # Attach to Edge debugging session
+
+# Initialize Edge WebDriver to connect to the existing session
 service = Service(EdgeChromiumDriverManager().install())
-driver = webdriver.Edge(service=service)
+options = webdriver.EdgeOptions()  # Ensure Edge-specific options are used
+driver = webdriver.Edge(service=service, options=options)
 
 # Perform 30 searches
 for i in range(30):
@@ -40,6 +45,10 @@ for i in range(30):
     print(f"Searching for: {question}")
 
     try:
+        # Open a new tab
+        driver.execute_script("window.open('');")  
+        driver.switch_to.window(driver.window_handles[-1])  # Switch to the new tab
+
         # Open Bing
         driver.get("https://www.bing.com")
 
@@ -61,10 +70,6 @@ for i in range(30):
 
         # Wait for 10 seconds
         time.sleep(10)
-
-        # Close the current tab and open a new one for the next search
-        driver.quit()
-        driver = webdriver.Edge(service=service)
 
     except Exception as e:
         print(f"Error on search {i+1}: {e}")

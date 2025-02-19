@@ -6,9 +6,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.edge.service import Service
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
-
-# Path to Microsoft Edge WebDriver
-EDGE_DRIVER_PATH = "C:/path/to/msedgedriver.exe"  # Change this to your actual path
+from webdriver_manager.microsoft import EdgeChromiumDriverManager
 
 # Sample question templates
 question_templates = [
@@ -31,8 +29,8 @@ topics = [
     "psychology", "deep sea creatures", "neural networks", "medieval castles"
 ]
 
-# Initialize Edge WebDriver
-service = Service(EDGE_DRIVER_PATH)
+# Initialize Edge WebDriver properly
+service = Service(EdgeChromiumDriverManager().install())
 driver = webdriver.Edge(service=service)
 
 # Perform 30 searches
@@ -64,10 +62,8 @@ for i in range(30):
         # Wait for 10 seconds
         time.sleep(10)
 
-        # Close the current tab
-        driver.close()
-
-        # Open a new Edge window for the next search
+        # Close the current tab and open a new one for the next search
+        driver.quit()
         driver = webdriver.Edge(service=service)
 
     except Exception as e:
